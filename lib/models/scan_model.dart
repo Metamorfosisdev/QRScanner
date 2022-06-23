@@ -1,19 +1,35 @@
 import 'dart:convert';
 
+import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
+
 ScanModel scanModelFromJson(String str) => ScanModel.fromJson(json.decode(str));
 
 String scanModelToJson(ScanModel data) => json.encode(data.toJson());
 
 class ScanModel {
   ScanModel({
-    required this.id,
-    required this.tipo,
+    this.id,
+    this.tipo,
     required this.valor,
-  });
+  }) {
+    if (valor.contains('http')) {
+      tipo = 'http';
+    } else {
+      tipo = 'geo';
+    }
+  }
 
-  final int id;
-  final String tipo;
-  final String valor;
+  int? id;
+  String? tipo;
+  String valor;
+
+  LatLng getLatLng() {
+    final latLng = valor.substring(4).split(',');
+    final lat = double.parse(latLng[0]);
+    final long = double.parse(latLng[1]);
+
+    return LatLng(lat, long);
+  }
 
   factory ScanModel.fromJson(Map<String, dynamic> json) => ScanModel(
         id: json["id"],
